@@ -22,7 +22,7 @@ function loadMarkers(minLat, maxLat, minLng, maxLng) {
 function formatDate(dateString) {
   const date = new Date(dateString);
   const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Monate sind nullbasiert
+  const month = String(date.getMonth() + 1).padStart(2, '0');
   const year = date.getFullYear();
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
@@ -33,73 +33,117 @@ function createDetailModal(place) {
   const modal = document.createElement('div');
   modal.className = 'modal';
 
+  // Function to send a DELETE request to the server
+  function deletePlace(placeId) {
+    fetch(`/api/places/${placeId}`, {
+      method: 'DELETE'
+    }).then(response => response.json()).then(data => {
+      if (data.status === 'success') {
+        document.body.removeChild(modal);
+        loadedMarkers.delete(placeId);
+        activeLayer.clearLayers();
+        loadedMarkers.forEach(marker => {
+          activeLayer.addLayer(marker);
+        });
+      } else {
+        alert('Fehler beim Löschen des Ortes: ' + data.message);
+      }
+    }).catch(error => {
+      alert('Fehler beim Löschen des Ortes: ' + error);
+    });
+  }
+
+  // Function to send an UPDATE request to the server
+  function updatePlace(placeId, updatedData) {
+    fetch(`/api/places/${placeId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(updatedData)
+    }).then(response => response.json()).then(data => {
+      if (data.status === 'success') {
+        document.body.removeChild(modal);
+        changeMarkerColor(placeId, 'white');
+      } else {
+        alert('Fehler beim Aktualisieren des Ortes: ' + data.message);
+      }
+    }).catch(error => {
+      alert('Fehler beim Aktualisieren des Ortes: ' + error);
+    });
+  }
+
+  // Function to change the marker color
+  function changeMarkerColor(placeId, color) {
+    const marker = loadedMarkers.get(placeId);
+    if (marker) {
+      marker.setIcon(L.divIcon({
+        className: 'custom-marker',
+        html: `<div style="background-color: ${color}; width: 24px; height: 24px; border-radius: 50%;"></div>`
+      }));
+    }
+  }
+
   let modalBodyContent = '';
 
-  // Check and add address as buttons
-  if (place.address) {
-    const addressQuery = encodeURIComponent(place.address);
-    const latLngQuery = `${place.latitude},${place.longitude}`;
-    modalBodyContent += `
+  // Editable fields
+  modalBodyContent += `
+    <div class="info-group">
+      <div class="info-label">Titel:</div>
+      <input type="text" class="info-value editable" id="place-title" value="${place.title}">
+    </div>
+    ${place.address ? `
       <div class="info-group">
         <div class="info-label">Adresse:</div>
         <div class="info-value">
-          <a href="https://www.google.com/maps/dir/?api=1&destination=${addressQuery}" target="_blank" class="route-button">
-            <img src="static/img/marker.png" alt="Routenbeschreibung Icon">
+          <a href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(place.address)}" target="_blank" class="route-button">
+            <img src="../img/marker.png" alt="Routenbeschreibung Icon">
             Routenbeschreibung
           </a>
-          <a href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${latLngQuery}" target="_blank" class="streetview-button">
-            <img src="static/img/streetview.png" alt="Street View Icon">
+          <a href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${place.latitude},${place.longitude}" target="_blank" class="streetview-button">
+            <img src="../img/streetview.png" alt="Street View Icon">
             Street View
           </a>
         </div>
       </div>
-    `;
-  }
-
-  // Check and add email
-  if (place.email) {
-    modalBodyContent += `
+    ` : ''}
+    ${place.email ? `
       <div class="info-group">
         <div class="info-label">E-Mail:</div>
-        <div class="info-value"><a href="mailto:${place.email}">${place.email}</a></div>
+        <input type="text" class="info-value editable" id="place-email" value="${place.email}">
       </div>
-    `;
-  }
-
-  // Check and add phone
-  if (place.phone) {
-    modalBodyContent += `
+    ` : ''}
+    ${place.phone ? `
       <div class="info-group">
         <div class="info-label">Telefon:</div>
-        <div class="info-value">${place.phone}</div>
+        <input type="text" class="info-value editable" id="place-phone" value="${place.phone}">
       </div>
-    `;
-  }
-
-  // Check and add website
-  if (place.website) {
-    modalBodyContent += `
+    ` : ''}
+    ${place.website ? `
       <div class="info-group">
         <div class="info-label">Website:</div>
-        <div class="info-value"><a href="${place.website}" target="_blank">${place.website}</a></div>
+        <input type="text" class="info-value editable" id="place-website" value="${place.website}">
       </div>
-    `;
-  }
-
-  // Check and add quote with expand/collapse functionality
-  if (place.quote) {
-    const quote = place.quote;
-    const truncatedQuote = quote.length > 100 ? quote.slice(0, 100) + '... ' : quote;
-
-    modalBodyContent += `
+    ` : ''}
+    ${place.quote ? `
       <div class="info-group">
         <div class="info-label">Zitat:</div>
-        <div class="info-value">
-          <span class="truncated-quote">${truncatedQuote}</span>
-          ${quote.length > 100 ? `
-            <a href="#" class="toggle-quote">Mehr Anzeigen</a>
-            <span class="full-text" style="display:none;">${quote}</span>
-          ` : ''}
+        <textarea class="info-value editable" id="place-quote">${place.quote}</textarea>
+      </div>
+    ` : ''}
+  `;
+
+  // Image section with delete buttons
+  if (place.images) {
+    modalBodyContent += `
+      <div class="image-section">
+        <div class="image-gallery">
+          ${place.images.split(', ').map((url, index) => `
+            <div class="image-wrapper">
+              <img class="gallery-image" src="${url}" alt="Bild von ${place.title}">
+              <button class="delete-image-button" data-url="${url}">Bild löschen</button>
+            </div>
+          `).join('')}
         </div>
       </div>
     `;
@@ -108,59 +152,58 @@ function createDetailModal(place) {
   modal.innerHTML = `
     <div class="modal-content">
       <div class="modal-header">
-        <h2 class="modal-title">${place.title}</h2>
+        <h2 class="modal-title">Ort bearbeiten: <span>${place.title}</span></h2>
         <span class="modal-date">${place.date ? formatDate(place.date) : 'Datum nicht angegeben'}</span>
         <span class="close">&times;</span>
       </div>
-      ${place.images ? `
-        <div class="image-section">
-          <div class="image-gallery">
-            ${place.images.split(', ').map((url, index) => `<img class="gallery-image" src="${url}" alt="Bild von ${place.title}" onclick="openModal(['${place.images.split(', ').join("','")}'], ${index})">`).join('')}
-          </div>
-        </div>
-      ` : ''}
       <div class="modal-body">
         <div class="info-column">
           ${modalBodyContent}
         </div>
       </div>
-      ${place.youtube_links ? `
-        <div class="video-section">
-          <h3>YouTube Videos:</h3>
-          <div class="video-container">
-            ${place.youtube_links.split(', ').map(link => {
-    return `<iframe src="${link}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-  }).join('')}
-          </div>
-        </div>
-      ` : ''}
+      <div class="modal-footer">
+        <button class="update-place-button">Ort aktualisieren</button>
+        <button class="delete-place-button">Ort löschen</button>
+      </div>
     </div>
   `;
 
   document.body.appendChild(modal);
 
-  // Toggle quote visibility
-  modal.querySelectorAll('.toggle-quote').forEach(link => {
-    link.onclick = function(e) {
-      e.preventDefault();
-      const fullText = this.nextElementSibling;
-      const truncatedText = this.previousElementSibling;
-      if (fullText.style.display === 'none') {
-        fullText.style.display = 'inline';
-        truncatedText.style.display = 'none';
-        this.textContent = 'Weniger Anzeigen';
-      } else {
-        fullText.style.display = 'none';
-        truncatedText.style.display = 'inline';
-        this.textContent = 'Mehr Anzeigen';
-      }
-    };
-  });
-
+  // Event listener for closing the modal
   modal.querySelector('.close').onclick = function() {
     document.body.removeChild(modal);
   };
 
+  // Event listener for deleting the place
+  modal.querySelector('.delete-place-button').onclick = function() {
+    deletePlace(place.id);
+  };
+
+  // Event listener for updating the place
+  modal.querySelector('.update-place-button').onclick = function() {
+    const updatedData = {
+      title: document.getElementById('place-title').value,
+      email: document.getElementById('place-email') ? document.getElementById('place-email').value : null,
+      phone: document.getElementById('place-phone') ? document.getElementById('place-phone').value : null,
+      website: document.getElementById('place-website') ? document.getElementById('place-website').value : null,
+      quote: document.getElementById('place-quote') ? document.getElementById('place-quote').value : null,
+      images: place.images.split(', ').filter(url => {
+        return !document.querySelector(`button[data-url="${url}"].deleted`);
+      }).join(', ')
+    };
+    updatePlace(place.id, updatedData);
+  };
+
+  // Event listeners for deleting images
+  modal.querySelectorAll('.delete-image-button').forEach(button => {
+    button.onclick = function() {
+      this.classList.add('deleted');
+      this.parentElement.style.display = 'none';
+    };
+  });
+
+  // Event listener for closing the modal when clicking outside
   window.onclick = function(event) {
     if (event.target == modal) {
       document.body.removeChild(modal);

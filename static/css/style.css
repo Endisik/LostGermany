@@ -3,6 +3,12 @@
 }
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
 
+.custom-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .image-modal {
   display: none;
   position: fixed;
@@ -274,4 +280,56 @@
 
 .streetview-button:hover {
   background-color: #EF5350;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.update-place-button, .delete-place-button {
+  padding: 10px 20px;
+  margin-left: 10px;
+  background-color: #E57373;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.update-place-button:hover, .delete-place-button:hover {
+  background-color: #EF5350;
+}
+
+.image-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.delete-image-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: rgba(255, 0, 0, 0.7);
+  color: white;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.delete-image-button:hover {
+  background-color: rgba(255, 0, 0, 1);
+}
+
+.editable {
+  display: block;
+  width: 100%;
+  margin-top: 5px;
+  padding: 5px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
