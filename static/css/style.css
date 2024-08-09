@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
+
 html, body {
   height: 100%;
   margin: 0;
@@ -6,7 +8,6 @@ html, body {
   height: 100%;
   width: 100%;
 }
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap');
 
 .image-modal {
   display: none;
@@ -307,4 +308,105 @@ html, body {
 
 .menu-button:hover {
   background-color: #0056b3;
+}
+
+
+#add-point-modal .modal-content {
+  padding: 30px;
+  border-radius: 15px;
+  width: 80%;
+  max-width: 600px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  background: #fff;
+}
+
+#add-point-modal .modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+#add-point-modal .modal-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+}
+
+#add-point-modal .close {
+  color: #aaa;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+#add-point-modal .close:hover {
+  color: #333;
+}
+
+#add-point-modal .modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+#add-point-modal .form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+}
+
+#add-point-modal .info-group {
+  display: flex;
+  flex-direction: column;
+}
+
+#add-point-modal .info-label {
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+#add-point-modal .info-value input,
+#add-point-modal .info-value textarea {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#add-point-modal .info-value input:focus,
+#add-point-modal .info-value textarea:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.25);
+}
+
+#add-point-modal button[type="submit"] {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  margin-top: 10px;
+  width: fit-content;
+}
+
+#add-point-modal button[type="submit"]:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+#add-point-modal button[type="submit"]:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 600px) {
+  #add-point-modal .form-grid {
+    grid-template-columns: 1fr;
+  }
 }

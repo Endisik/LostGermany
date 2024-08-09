@@ -14,12 +14,14 @@
 <body>
 <div id="map"></div>
 <div id="floating-menu">
-  <button class="menu-button">Funktion 1</button>
+  <button class="menu-button" id="open-add-point-modal">Funktion 1</button>
   <button class="menu-button">Funktion 2</button>
   <button class="menu-button">Funktion 3</button>
   <button class="menu-button">Funktion 4</button>
   <button class="menu-button">Funktion 5</button>
 </div>
+
+<!-- Altes Modal -->
 <div id="image-modal" class="image-modal">
   <span class="close-image-modal">&times;</span>
   <img class="image-modal-content" id="image-modal-img">
@@ -27,6 +29,67 @@
   <a class="next" onclick="plusSlides(1)">&#10095;</a>
   <div class="thumbnail-container" id="thumbnail-container"></div>
 </div>
+
+<!-- Button to open the modal -->
+<button class="menu-button" onclick="openAddPointModal()">Neuen Punkt hinzufügen</button>
+
+<div id="add-point-modal" class="modal" style="display: none;">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2 class="modal-title">Neuen Punkt hinzufügen</h2>
+      <span class="close" onclick="closeAddPointModal()">&times;</span>
+    </div>
+    <div class="modal-body">
+      <form id="add-point-form">
+        <div class="form-grid">
+          <div class="info-group">
+            <label class="info-label" for="title">Titel:</label>
+            <input class="info-value" type="text" id="title" name="title" required>
+          </div>
+          <div class="info-group">
+            <label class="info-label" for="latitude">Breitengrad:</label>
+            <input class="info-value" type="number" step="any" id="latitude" name="latitude" required>
+          </div>
+          <div class="info-group">
+            <label class="info-label" for="longitude">Längengrad:</label>
+            <input class="info-value" type="number" step="any" id="longitude" name="longitude" required>
+          </div>
+          <div class="info-group">
+            <label class="info-label" for="address">Adresse:</label>
+            <input class="info-value" type="text" id="address" name="address" required>
+          </div>
+          <div class="info-group">
+            <label class="info-label" for="email">E-Mail:</label>
+            <input class="info-value" type="email" id="email" name="email">
+          </div>
+          <div class="info-group">
+            <label class="info-label" for="phone">Telefon:</label>
+            <input class="info-value" type="text" id="phone" name="phone">
+          </div>
+          <div class="info-group">
+            <label class="info-label" for="website">Website:</label>
+            <input class="info-value" type="url" id="website" name="website">
+          </div>
+          <div class="info-group">
+            <label class="info-label" for="quote">Zitat:</label>
+            <textarea class="info-value" id="quote" name="quote"></textarea>
+          </div>
+          <div class="info-group">
+            <label class="info-label" for="images">Bilder:</label>
+            <input class="info-value" type="text" id="images" name="images" placeholder="Bild-URLs, getrennt durch Kommas">
+          </div>
+          <div class="info-group">
+            <label class="info-label" for="youtube_links">YouTube-Links:</label>
+            <input class="info-value" type="text" id="youtube_links" name="youtube_links" placeholder="YouTube-URLs, getrennt durch Kommas">
+          </div>
+        </div>
+        <button type="submit">Punkt hinzufügen</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+
 <script src="../static/js/script.js"></script>
 </body>
 </html>

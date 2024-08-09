@@ -278,16 +278,110 @@ function highlightThumbnail(index) {
   });
 }
 
-// Event Listener für das Schließen des Modals
+// Event Listener für das Schließen des alten Modals
 document.querySelector('.close-image-modal').onclick = function() {
   closeModal();
 };
 
-// Event Listener für das Schließen des Modals bei Klick außerhalb des Bildes
 window.onclick = function(event) {
-  var modal = document.getElementById('image-modal');
-  if (event.target == modal) {
+  if (event.target == document.getElementById('image-modal')) {
     closeModal();
   }
 };
 
+// Event Listener für das neue Modal
+document.getElementById('open-add-point-modal').addEventListener('click', function() {
+  document.getElementById('add-point-modal').style.display = 'block';
+});
+
+document.querySelector('#add-point-modal .close').addEventListener('click', function() {
+  document.getElementById('add-point-modal').style.display = 'none';
+});
+
+window.onclick = function(event) {
+  if (event.target == document.getElementById('add-point-modal')) {
+    document.getElementById('add-point-modal').style.display = 'none';
+  }
+};
+
+document.getElementById('add-point-form').addEventListener('submit', function(event) {
+  event.preventDefault();
+
+  const formData = new FormData(this);
+  const data = {};
+  formData.forEach((value, key) => {
+    data[key] = value;
+  });
+
+  fetch('/api/add_place', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  })
+    .then(response => response.json())
+    .then(result => {
+      if (result.success) {
+        alert('Punkt erfolgreich hinzugefügt!');
+        document.getElementById('add-point-modal').style.display = 'none';
+        // Optional: Lade die Marker neu
+        var bounds = map.getBounds();
+        loadMarkers(bounds.getSouth(), bounds.getNorth(), bounds.getWest(), bounds.getEast());
+      } else {
+        alert('Fehler beim Hinzufügen des Punktes.');
+      }
+    });
+});
+document.addEventListener("DOMContentLoaded", function() {
+  // Funktion zum Öffnen des Modals
+  function openAddPointModal() {
+    document.getElementById('add-point-modal').style.display = 'block';
+  }
+
+  // Funktion zum Schließen des Modals
+  function closeAddPointModal() {
+    document.getElementById('add-point-modal').style.display = 'none';
+  }
+
+  // Event Listener für den Button
+  document.querySelector('.menu-button').addEventListener('click', openAddPointModal);
+
+  // Event Listener für das Schließen des Modals bei Klick auf das Schließen-Icon
+  document.querySelector('#add-point-modal .close').addEventListener('click', closeAddPointModal);
+
+  // Event Listener für das Schließen des Modals bei Klick außerhalb des Modals
+  window.addEventListener('click', function(event) {
+    if (event.target == document.getElementById('add-point-modal')) {
+      closeAddPointModal();
+    }
+  });
+
+  // Event Listener für das Formular
+  document.getElementById('add-point-form').addEventListener('submit', function(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const pointData = {};
+    formData.forEach((value, key) => {
+      pointData[key] = value;
+    });
+
+    // Hier können Sie den Code zum Senden der Daten an Ihren Server hinzufügen
+    fetch('/api/add_point', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(pointData),
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Erfolg:', data);
+        closeAddPointModal();
+        loadMarkers(); // Aktualisieren Sie die Marker, um den neuen Punkt anzuzeigen
+      })
+      .catch((error) => {
+        console.error('Fehler:', error);
+      });
+  });
+});

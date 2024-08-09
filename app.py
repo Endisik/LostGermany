@@ -42,5 +42,23 @@ def places():
     return jsonify(places)
   return jsonify([])
 
+@app.route('/api/add_place', methods=['POST'])
+def add_place():
+  data = request.get_json()
+  connection = pymysql.connect(
+    host='localhost',
+    user='root',
+    password='1234',
+    database='lostgermany'
+  )
+  cursor = connection.cursor()
+  cursor.execute("""
+        INSERT INTO Places (title, latitude, longitude, address, email, phone, website, quote)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+    """, (data['title'], data['latitude'], data['longitude'], data['address'], data['email'], data['phone'], data['website'], data['quote']))
+  connection.commit()
+  connection.close()
+  return jsonify({'success': True})
+
 if __name__ == '__main__':
   app.run(debug=True)
