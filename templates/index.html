@@ -14,14 +14,26 @@
 <body>
 <div id="map"></div>
 <div id="floating-menu">
-  <button class="menu-button" id="open-add-point-modal">Funktion 1</button>
+  <button class="menu-button" id="open-add-point-modal">Ort hinzufügen</button>
   <button class="menu-button">Funktion 2</button>
   <button class="menu-button">Funktion 3</button>
   <button class="menu-button">Funktion 4</button>
   <button class="menu-button">Funktion 5</button>
 </div>
 
-<!-- Altes Modal -->
+<div id="floating-search-window" class="floating-window">
+  <h3>Ort suchen</h3>
+  <div class="search-container">
+    <input type="text" id="search-input" placeholder="Stadt oder Ort eingeben">
+    <button id="search-button" class="search-button">
+      <img src="/img/search-icon.png" alt="Suchen">
+    </button>
+  </div>
+  <ul id="suggestions-list" class="suggestions-list"></ul>
+</div>
+
+
+<!-- Ort info Modal -->
 <div id="image-modal" class="image-modal">
   <span class="close-image-modal">&times;</span>
   <img class="image-modal-content" id="image-modal-img">
@@ -29,9 +41,6 @@
   <a class="next" onclick="plusSlides(1)">&#10095;</a>
   <div class="thumbnail-container" id="thumbnail-container"></div>
 </div>
-
-<!-- Button to open the modal -->
-<button class="menu-button" onclick="openAddPointModal()">Neuen Punkt hinzufügen</button>
 
 <div id="add-point-modal" class="modal" style="display: none;">
   <div class="modal-content">

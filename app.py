@@ -7,8 +7,8 @@ def get_places_within_bounds(min_lat, max_lat, min_lng, max_lng):
   connection = pymysql.connect(
     host='localhost',
     user='root',
-    password='1234',
-    database='lostgermany'
+    password='123',
+    database='lg'
   )
   cursor = connection.cursor(pymysql.cursors.DictCursor)
   cursor.execute("""
@@ -31,6 +31,16 @@ def get_places_within_bounds(min_lat, max_lat, min_lng, max_lng):
 def index():
   return render_template('index.html')
 
+def add_google_satellite_image(places, api_key):
+  for place in places:
+    place['satellite_image'] = get_google_maps_static_image(place['latitude'], place['longitude'], api_key)
+  return places
+
+
+def get_google_maps_static_image(lat, lng, api_key):
+  return f"https://maps.googleapis.com/maps/api/staticmap?center={lat},{lng}&zoom=15&size=600x400&maptype=satellite&key={api_key}"
+
+
 @app.route('/api/places')
 def places():
   min_lat = request.args.get('min_lat', type=float)
@@ -39,6 +49,7 @@ def places():
   max_lng = request.args.get('max_lng', type=float)
   if min_lat is not None and max_lat is not None and min_lng is not None and max_lng is not None:
     places = get_places_within_bounds(min_lat, max_lat, min_lng, max_lng)
+    places = add_google_satellite_image(places, 'AIzaSyDF8XTf9WyBaiCA-cUhygDXQNh3IRx0y8o')
     return jsonify(places)
   return jsonify([])
 

@@ -410,3 +410,85 @@ html, body {
     grid-template-columns: 1fr;
   }
 }
+
+.floating-window {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  width: 300px;
+  background-color: rgba(255, 255, 255, 0.9);
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+}
+
+#search-input {
+  width: calc(100% - 22px);
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+#search-button, #close-search-window {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 5px;
+  transition: background-color 0.3s ease;
+}
+
+#search-button:hover, #close-search-window:hover {
+  background-color: #0056b3;
+}
+.suggestions-list {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  width: calc(100% - 40px); /* Anpassung der Breite basierend auf dem Inputfeld */
+  background-color: white;
+  border: 1px solid #ccc;
+  max-height: 150px;
+  overflow-y: auto;
+  z-index: 1000;
+}
+
+#suggestions-list li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.suggestions-list li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.suggestions-list li:hover {
+  background-color: #f0f0f0;
+}
+
+#search-input {
+  width: calc(100% - 40px); /* Berechnung für den Platz des Icons */
+  padding-right: 40px; /* Platz für das Icon einrechnen */
+}
+
+.search-button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0 10px;
+}
+
+.search-button img {
+  width: 20px;
+  height: 20px;
+}

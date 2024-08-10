@@ -35,28 +35,46 @@ function createDetailModal(place) {
 
   let modalBodyContent = '';
 
-  // Check and add address as buttons
+  // Routenbeschreibung und Streetview mittels latitude und longitude
   if (place.address) {
-    const addressQuery = encodeURIComponent(place.address);
+    // Längen- und Breitengrad in latLngQuery speichern
     const latLngQuery = `${place.latitude},${place.longitude}`;
     modalBodyContent += `
-      <div class="info-group">
-        <div class="info-label">Adresse:</div>
-        <div class="info-value">
-          <a href="https://www.google.com/maps/dir/?api=1&destination=${addressQuery}" target="_blank" class="route-button">
-            <img src="static/img/marker.png" alt="Routenbeschreibung Icon">
-            Routenbeschreibung
-          </a>
-          <a href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${latLngQuery}" target="_blank" class="streetview-button">
-            <img src="static/img/streetview.png" alt="Street View Icon">
-            Street View
-          </a>
+        <div class="info-group">
+            <div class="info-value">
+                <a href="https://www.google.com/maps/dir/?api=1&destination=${latLngQuery}" target="_blank" class="route-button">
+                    <img src="static/img/marker.png" alt="Routenbeschreibung Icon">
+                    Route
+                </a>
+                <a href="https://www.google.com/maps/@?api=1&map_action=pano&viewpoint=${latLngQuery}" target="_blank" class="streetview-button">
+                    <img src="static/img/streetview.png" alt="Street View Icon">
+                    StreetView
+                </a>
+            </div>
         </div>
-      </div>
-    `;
+        `;
   }
 
-  // Check and add email
+  let imagesHTML = "";
+
+  // Bilder in DB
+  if (place.images) {
+    constimagesHTML = place.images.split(', ').map((url, index) => `<img class="gallery-image" src="${url}" alt="Bild von ${place.title}" onclick="openModal(['${place.images.split(', ').join("','")}'], ${index})">`).join('');
+
+    // Satellitenbild
+    const satelliteImageHTML = place.satellite_image ? `<img class="gallery-image" src="${place.satellite_image}" alt="Satellitenbild von ${place.title}" onclick="openModal(['${place.satellite_image}'], 0)">` : '';
+
+    modalBodyContent += `
+        <div class="image-section">
+            <div class="image-gallery">
+                ${imagesHTML}
+                ${satelliteImageHTML}
+            </div>
+        </div>
+        `;
+  }
+
+  // Email
   if (place.email) {
     modalBodyContent += `
       <div class="info-group">
@@ -66,7 +84,7 @@ function createDetailModal(place) {
     `;
   }
 
-  // Check and add phone
+  // Phone number
   if (place.phone) {
     modalBodyContent += `
       <div class="info-group">
@@ -76,17 +94,21 @@ function createDetailModal(place) {
     `;
   }
 
-  // Check and add website
-  if (place.website) {
-    modalBodyContent += `
-      <div class="info-group">
-        <div class="info-label">Website:</div>
-        <div class="info-value"><a href="${place.website}" target="_blank">${place.website}</a></div>
-      </div>
-    `;
-  }
+  // Website
+    if (place.website) {
+      const domain = extractDomain(place.website);
+      modalBodyContent += `
+        <div class="info-group">
+          <div class="info-label">Website:</div>
+          <div class="info-value">
+            <a href="${place.website}" target="_blank">${domain}</a>
+          </div>
+        </div>
+      `;
+    }
 
-  // Check and add quote with expand/collapse functionality
+
+  // quotes
   if (place.quote) {
     const quote = place.quote;
     const truncatedQuote = quote.length > 100 ? quote.slice(0, 100) + '... ' : quote;
@@ -109,31 +131,14 @@ function createDetailModal(place) {
     <div class="modal-content">
       <div class="modal-header">
         <h2 class="modal-title">${place.title}</h2>
-        <span class="modal-date">${place.date ? formatDate(place.date) : 'Datum nicht angegeben'}</span>
+        <span class="modal-date">${place.date ? formatDate(place.date) : ''}</span>
         <span class="close">&times;</span>
       </div>
-      ${place.images ? `
-        <div class="image-section">
-          <div class="image-gallery">
-            ${place.images.split(', ').map((url, index) => `<img class="gallery-image" src="${url}" alt="Bild von ${place.title}" onclick="openModal(['${place.images.split(', ').join("','")}'], ${index})">`).join('')}
-          </div>
-        </div>
-      ` : ''}
       <div class="modal-body">
         <div class="info-column">
           ${modalBodyContent}
         </div>
       </div>
-      ${place.youtube_links ? `
-        <div class="video-section">
-          <h3>YouTube Videos:</h3>
-          <div class="video-container">
-            ${place.youtube_links.split(', ').map(link => {
-    return `<iframe src="${link}" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>`;
-  }).join('')}
-          </div>
-        </div>
-      ` : ''}
     </div>
   `;
 
@@ -166,6 +171,14 @@ function createDetailModal(place) {
       document.body.removeChild(modal);
     }
   };
+}
+
+function extractDomain(url) {
+  // Entfernt 'http://', 'https://', oder 'www.' am Anfang
+  let domain = url.replace(/^https?:\/\/(www\.)?/, '');
+  // Schneidet alles nach dem ersten '/' ab
+  domain = domain.split('/')[0];
+  return domain;
 }
 
 function updateMarkers(data) {
@@ -378,10 +391,95 @@ document.addEventListener("DOMContentLoaded", function() {
       .then(data => {
         console.log('Erfolg:', data);
         closeAddPointModal();
-        loadMarkers(); // Aktualisieren Sie die Marker, um den neuen Punkt anzuzeigen
+        loadMarkers();
       })
       .catch((error) => {
         console.error('Fehler:', error);
       });
   });
 });
+
+document.getElementById('search-button').addEventListener('click', function() {
+  var query = document.getElementById('search-input').value;
+  if (query) {
+    searchLocation(query);
+  }
+});
+
+document.getElementById('close-search-window').addEventListener('click', function() {
+  document.getElementById('floating-search-window').style.display = 'none';
+});
+
+function fetchSuggestions(query) {
+  console.log(`Suche nach: ${query}`); // Zum Debuggen
+  fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&countrycodes=de&limit=5`)
+    .then(response => response.json())
+    .then(data => {
+      console.log('Empfangene Daten:', data); // Zum Debuggen
+      if (data.length > 0) {
+        displaySuggestions(data);
+      } else {
+        clearSuggestions();
+      }
+    })
+    .catch(error => console.error('Fehler bei der Ortssuche:', error));
+}
+
+function displaySuggestions(suggestions) {
+  var suggestionsList = document.getElementById('suggestions-list');
+  suggestionsList.innerHTML = '';
+  suggestions.forEach(suggestion => {
+    var li = document.createElement('li');
+    li.textContent = suggestion.display_name;
+    li.setAttribute('data-lat', suggestion.lat);
+    li.setAttribute('data-lon', suggestion.lon);
+    suggestionsList.appendChild(li);
+  });
+  suggestionsList.style.display = 'block';
+}
+
+function clearSuggestions() {
+  var suggestionsList = document.getElementById('suggestions-list');
+  suggestionsList.innerHTML = '';
+  suggestionsList.style.display = 'none';
+}
+
+document.getElementById('search-input').addEventListener('input', function() {
+  var query = this.value;
+  if (query.length > 2) {
+    fetchSuggestions(query);
+  } else {
+    clearSuggestions();
+  }
+});
+
+document.getElementById('suggestions-list').addEventListener('click', function(event) {
+  if (event.target.tagName === 'LI') {
+    var lat = event.target.getAttribute('data-lat');
+    var lon = event.target.getAttribute('data-lon');
+    map.setView(new L.LatLng(lat, lon), 10);
+    clearSuggestions();
+  }
+});
+
+document.getElementById('search-button').addEventListener('click', function() {
+  var query = document.getElementById('search-input').value;
+  if (query) {
+    searchLocation(query);
+  }
+});
+
+function searchLocation(query) {
+  fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`)
+    .then(response => response.json())
+    .then(data => {
+      if (data.length > 0) {
+        var lat = data[0].lat;
+        var lon = data[0].lon;
+        map.setView(new L.LatLng(lat, lon), 12);
+      } else {
+        alert('Ort nicht gefunden');
+      }
+    })
+    .catch(error => console.error('Fehler bei der Ortssuche:', error));
+}
