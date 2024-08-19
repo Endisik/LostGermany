@@ -67,7 +67,7 @@ function createDetailModal(place) {
     modalBodyContent += `
         <div class="image-section">
             <div class="image-gallery">
-                ${imagesHTML}
+                ${constimagesHTML}
                 ${satelliteImageHTML}
             </div>
         </div>

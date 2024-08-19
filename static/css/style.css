@@ -423,28 +423,6 @@ html, body {
   z-index: 1000;
 }
 
-#search-input {
-  width: calc(100% - 22px);
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  margin-bottom: 10px;
-}
-
-#search-button, #close-search-window {
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-right: 5px;
-  transition: background-color 0.3s ease;
-}
-
-#search-button:hover, #close-search-window:hover {
-  background-color: #0056b3;
-}
 .suggestions-list {
   list-style-type: none;
   margin: 0;
@@ -472,23 +450,33 @@ html, body {
   background-color: #f0f0f0;
 }
 
-#search-input {
-  width: calc(100% - 40px); /* Berechnung für den Platz des Icons */
-  padding-right: 40px; /* Platz für das Icon einrechnen */
+.search-container {
+  position: relative;
+  width: 100%; /* Passt die Breite des Containers an, sodass es das Textfeld vollständig enthält */
 }
 
-.search-button {
-  position: absolute;
-  right: 0;
-  top: 0;
-  height: 100%;
-  border: none;
+#search-input {
+  width: 100%; /* Sorgt dafür, dass das Textfeld die volle Breite einnimmt */
+  padding-right: 45px; /* Platz für den Button auf der rechten Seite */
+  height: 40px; /* Höhe des Textfeldes */
+  box-sizing: border-box; /* Einschließlich Padding in der Breitenberechnung */
+}
+
+#search-button {
   background: none;
+  border: none;
+  padding: 0;
   cursor: pointer;
-  padding: 0 10px;
+  position: absolute;
+  right: 5px; /* Kleine Anpassung, um es nicht direkt am Rand zu platzieren */
+  top: 50%;
+  transform: translateY(-50%); /* Vertikale Zentrierung */
+  height: 40%; /* Höhe relativ zum Textfeld */
+  width: 20px; /* Breite für das Bild */
 }
 
 .search-button img {
-  width: 20px;
-  height: 20px;
+  width: 100%; /* Bild passt sich der Button-Breite an */
+  height: 100%; /* Bild passt sich der Button-Höhe an */
+  object-fit: contain; /* Bild skalieren ohne Verzerrung */
 }

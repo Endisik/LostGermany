@@ -1,7 +1,8 @@
 from flask import Flask, jsonify, render_template, request
 import pymysql
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
+
 
 def get_places_within_bounds(min_lat, max_lat, min_lng, max_lng):
   connection = pymysql.connect(
@@ -27,9 +28,11 @@ def get_places_within_bounds(min_lat, max_lat, min_lng, max_lng):
   connection.close()
   return places
 
+
 @app.route('/')
 def index():
   return render_template('index.html')
+
 
 def add_google_satellite_image(places, api_key):
   for place in places:
@@ -53,6 +56,7 @@ def places():
     return jsonify(places)
   return jsonify([])
 
+
 @app.route('/api/add_place', methods=['POST'])
 def add_place():
   data = request.get_json()
@@ -70,6 +74,7 @@ def add_place():
   connection.commit()
   connection.close()
   return jsonify({'success': True})
+
 
 if __name__ == '__main__':
   app.run(debug=True)

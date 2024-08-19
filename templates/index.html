@@ -15,19 +15,15 @@
 <div id="map"></div>
 <div id="floating-menu">
   <button class="menu-button" id="open-add-point-modal">Ort hinzufügen</button>
-  <button class="menu-button">Funktion 2</button>
-  <button class="menu-button">Funktion 3</button>
-  <button class="menu-button">Funktion 4</button>
-  <button class="menu-button">Funktion 5</button>
 </div>
 
 <div id="floating-search-window" class="floating-window">
-  <h3>Ort suchen</h3>
   <div class="search-container">
-    <input type="text" id="search-input" placeholder="Stadt oder Ort eingeben">
+    <input type="text" id="search-input" placeholder="Suchen..">
     <button id="search-button" class="search-button">
-      <img src="/img/search-icon.png" alt="Suchen">
+      <img src="{{ url_for('static', filename='img/search-icon.png') }}" alt="Suchen">
     </button>
+
   </div>
   <ul id="suggestions-list" class="suggestions-list"></ul>
 </div>
