@@ -11,6 +11,7 @@ map.addLayer(activeLayer);
 
 let loadedMarkers = new Map();
 
+
 function loadMarkers(minLat, maxLat, minLng, maxLng) {
   fetch(`/api/places?min_lat=${minLat}&max_lat=${maxLat}&min_lng=${minLng}&max_lng=${maxLng}`)
     .then(response => response.json())
@@ -22,7 +23,7 @@ function loadMarkers(minLat, maxLat, minLng, maxLng) {
 function formatDate(dateString) {
   const date = new Date(dateString);
   const day = String(date.getDate()).padStart(2, '0');
-  const month = String(date.getMonth() + 1).padStart(2, '0'); // Monate sind nullbasiert
+  const month = String(date.getMonth() + 1).padStart(2, '0');
   const year = date.getFullYear();
   const hours = String(date.getHours()).padStart(2, '0');
   const minutes = String(date.getMinutes()).padStart(2, '0');
@@ -196,7 +197,8 @@ function updateMarkers(data) {
             createDetailModal(place);
           });
         });
-      loadedMarkers.set(place.id, marker);
+      loadedMarkers.set(place.id, marker); // Marker in die Map hinzufügen
+      activeLayer.addLayer(marker); // Marker der aktiven Layer hinzufügen
     }
   });
 

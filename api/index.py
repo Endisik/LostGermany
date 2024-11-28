@@ -1,15 +1,17 @@
 from flask import Flask, jsonify, render_template, request
 import pymysql
+import os
 
 app = Flask(__name__, static_url_path='/static')
 
 
 def get_places_within_bounds(min_lat, max_lat, min_lng, max_lng):
   connection = pymysql.connect(
-    host='localhost',
-    user='root',
-    password='123',
-    database='lg'
+    host=os.environ.get('MYSQLHOST'),
+    user=os.environ.get('MYSQLUSER'),
+    password=os.environ.get('MYSQLPASSWORD'),
+    database=os.environ.get('MYSQLDATABASE'),
+    port=int(os.environ.get('MYSQLPORT'))
   )
   cursor = connection.cursor(pymysql.cursors.DictCursor)
   cursor.execute("""
@@ -61,10 +63,11 @@ def places():
 def add_place():
   data = request.get_json()
   connection = pymysql.connect(
-    host='localhost',
-    user='root',
-    password='1234',
-    database='lostgermany'
+    host=os.environ.get('MYSQLHOST'),
+    user=os.environ.get('MYSQLUSER'),
+    password=os.environ.get('MYSQLPASSWORD'),
+    database=os.environ.get('MYSQLDATABASE'),
+    port=int(os.environ.get('MYSQLPORT'))
   )
   cursor = connection.cursor()
   cursor.execute("""
